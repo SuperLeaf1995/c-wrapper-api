@@ -6,6 +6,7 @@
 
 #include "http.h"
 #include "guild.h"
+#include "json-wrapper.h"
 
 /*
     There is really not much magic in Ruqqus API. It's just a bunch of requests
@@ -30,13 +31,29 @@
     Functions that does a request and then fills the data
 */
 
+json_object * fetch_json_object(json_object * root, const char * key) {
+    json_object * sub;
+    if(json_object_object_get_ex(root,key,&sub)) {
+        return sub;
+    } else {
+        fprintf(stderr,"JSON error\n");
+        return NULL;
+    }
+}
+
 int main(void) {
     struct http_handler handle;
     struct ruqqus_guild guild;
     printf("RuqqusBot v1.0 by Superleaf1995\n");
     curl_global_init(CURL_GLOBAL_ALL);
 
-    ruqqus_guild_get(&guild,&handle,"linux");
+    struct http_buffer buff;
+
+    http_init_buffer(&buff);
+    http_get_request(&buff,&handle,"https://ruqqus.com/api/v1/guild/linux");
+    http_end_buffer(&buff);
+
+    //ruqqus_guild_get(&guild,&handle,"linux");
 
     curl_global_cleanup();
     return 0;

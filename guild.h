@@ -3,22 +3,19 @@
 
 #include <stdlib.h>
 
+#define NUMBER_OF_GUILD_STRINGS 9
+
 struct ruqqus_guild {
-    char * banner_url;
-    char * color;
+    char ** char_fields;
+    size_t * num_fields;
+    char * bool_fields;
+
     size_t created_utc;
-    char * description;
-    char * description_html;
-    char * fullname;
-    char * id;
     char is_banned;
     char is_private;
     char is_restricted;
     size_t mods_count;
-    char * name;
     char over_18;
-    char * permalink;
-    char * profile_url;
     size_t subscriber_count;
 };
 

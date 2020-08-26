@@ -5,42 +5,41 @@
 #include "json-wrapper.h"
 #include "guild.h"
 
+static const char * char_keyval[NUMBER_OF_GUILD_STRINGS+1] = {
+    "color","banner_url","description","description_html",
+    "fullname","id","name","permalink","profile_url"
+};
+
+static const char * num_keyval[NUMBER_OF_GUILD_NUMS+1] = {
+    "created_utc","mods_count","subscriber_count"
+};
+
 /*
     Fills the guild struct with the JSON data on str
 */
 int ruqqus_guild_fill(struct ruqqus_guild * guild, const char * str) {
-    json_object * root;
-    json_object * sub;
+    json_object * root,sub;
+    int i = 0;
 
-    /* Fill the structure with the given JSON */
+    /* Fill the structure's strings with the given JSON */
     root = json_tokener_parse(str);
-
-    sub = fetch_json_object(root,"banner_url");
-    if(sub == NULL) {
-        fprintf(stderr,"JSON error\n");
-        return 1;
+    guild->char_fields = malloc(sizeof(char *)*NUMBER_OF_GUILD_STRINGS+1);
+    for(i = 0; i < NUMBER_OF_GUILD_STRINGS; i++) {
+        sub = fetch_json_object(root,char_keyval[i]);
+        if(sub == NULL) {
+            fprintf(stderr,"JSON error fetching %s",char_keyval[i]);
+            return 1;
+        }
+        guild->char_fields[i] = malloc(strlen(json_object_to_json_string(sub))+1);
+        if(guild->char_fields[i] == NULL) {
+            fprintf(stderr,"Alloc request error\n");
+            return 2;
+        }
+        strcpy(guild->char_fields[i],json_object_to_json_string(sub));
+#ifdef __DEBUG__
+        printf("%s : %s\n\n",char_keyval[i],guild.char_fields[i]);
+#endif
     }
-
-    /* banner_url */
-    guild->banner_url = malloc(strlen(json_object_to_json_string(sub))+1);
-    if(guild->banner_url == NULL) {
-        fprintf(stderr,"Alloc request error\n");
-        return 2;
-    }
-    strcpy(guild->banner_url,json_object_to_json_string(sub));
-
-    /* color */
-    sub = fetch_json_object(root,"color");
-    if(sub == NULL) {
-        fprintf(stderr,"JSON error\n");
-        return 1;
-    }
-    guild->color = malloc(strlen(json_object_to_json_string(sub))+1);
-    if(guild->color == NULL) {
-        fprintf(stderr,"Alloc request error\n");
-        return 2;
-    }
-    strcpy(guild->color,json_object_to_json_string(sub));
     return 0;
 }
 
