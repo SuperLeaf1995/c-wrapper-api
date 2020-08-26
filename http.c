@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include <json-c/json.h>
+
+#include <stdio.h>
+#include <curl/curl.h>
 
 #include "http.h"
 
